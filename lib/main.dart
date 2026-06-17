@@ -60,7 +60,13 @@ class _SpinWheelPageState extends State<SpinWheelPage> {
           content: Text("You won $prize"),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.pop(context);
+
+                setState(() {
+                  result = "";
+                });
+              },
               child: const Text("OK"),
             )
           ],
@@ -104,48 +110,54 @@ class _SpinWheelPageState extends State<SpinWheelPage> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              // Container(
+              //   margin: const EdgeInsets.symmetric(horizontal: 20),
+              //   padding: const EdgeInsets.all(16),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white.withOpacity(.15),
+              //     borderRadius: BorderRadius.circular(20),
+              //   ),
+              // ),
 
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Wallet Balance",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      "₹500",
-                      style: TextStyle(
-                        color: Colors.amber,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
+              // const SizedBox(height: 30),
 
               Expanded(
                 child: FortuneWheel(
                   selected: controller.stream,
                   animateFirst: false,
+
+                  indicators: [
+                    FortuneIndicator(
+                      alignment: Alignment.topCenter,
+                      child: Transform.translate(
+                        offset: const Offset(0, 20), // move down toward wheel
+                        // for move up it should be offset: const Offset(0, -20)
+                        child: RotatedBox(
+                          quarterTurns: 1,
+                          child: Icon(
+                            Icons.play_arrow,
+                            size: 40,
+                            color: Color(0xFFFFD700),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+
                   items: [
                     for (var item in items)
                       FortuneItem(
+                        style: FortuneItemStyle(
+                          color: Color(0xFF2563EB),
+                          borderColor: Color(0xFFFFD700),
+                          borderWidth: 2,
+                        ),
                         child: Text(
                           item,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontSize: 16,
                           ),
                         ),
                       ),
