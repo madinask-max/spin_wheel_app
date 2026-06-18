@@ -4,18 +4,19 @@ import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer';
 
+///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget { ///Stateful Widget because UI changes happens when User spins wheel and result window show
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SpinWheelPage(),
+      home: SpinWheelPage(), ///First screen shown to user.
     );
   }
 }
@@ -27,37 +28,36 @@ class SpinWheelPage extends StatefulWidget {
   State<SpinWheelPage> createState() => _SpinWheelPageState();
 }
 
-class _SpinWheelPageState extends State<SpinWheelPage>
+class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animations, Reward logic, UI updates
     with SingleTickerProviderStateMixin {
-  final StreamController<int> controller = StreamController<int>();
+  final StreamController<int> controller = StreamController<int>();  ///Controls the wheel spinning.
 
-  late AnimationController _controller;
-  late Animation<double> _swingAnimation;
+  late AnimationController _controller; ///Controls logo swinging.
+  late Animation<double> _swingAnimation; ///Creates motion: Left → Right → Left
 
   final List<String> items = [
-    "Get 5%",
-    "Flat ₹100",
-    "Get 10%",
-    "Flat ₹200",
-    "Get 15%",
-    "Flat ₹300",
-    "Get 20%",
-    "Gift Card",
-    "Get 30%",
-    "Try Again",
-    "Get 50%",
+    "🎉🎉🎉\n50%",
+    "💰\n₹100",
+    "🎊\n10%",
+    "💰💰\n₹200",
+    "😍\n15%",
+    "💰💰💰\n₹300",
+    "🎁\n20%",
+    "🎫\nCard",
+    "🔥\n30%",
+    "🔄\nRetry",
   ];
   int spinCount = 0;
   String result = "";
 
   @override
-  void initState() {
+  void initState() { ///Runs once when screen loads.
     super.initState();
 
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    )..repeat(reverse: true); ///Left ↔ Right continuous movement.
 
     _swingAnimation = Tween<double>(
       begin: -0.08,
@@ -69,57 +69,89 @@ class _SpinWheelPageState extends State<SpinWheelPage>
       ),
     );
   }
-
   int getRewardIndex() {
     int random = Fortune.randomInt(1, 101);
 
     if (random <= 3) {
-      return items.indexOf("Get 50%");
+      return 0; // 🎉 50%
     } else if (random <= 8) {
-      return items.indexOf("Gift Card");
+      return 7; // 🎫 Card
     } else if (random <= 18) {
-      return items.indexOf("Get 30%");
+      return 8; // 🔥 30%
     } else if (random <= 30) {
-      return items.indexOf("Get 20%");
+      return 6; // 🎁 20%
     } else if (random <= 42) {
-      return items.indexOf("Flat ₹300");
+      return 5; // 💸 ₹300
     } else if (random <= 55) {
-      return items.indexOf("Get 15%");
+      return 4; // 😍 15%
     } else if (random <= 68) {
-      return items.indexOf("Flat ₹200");
+      return 3; // 💰 ₹200
     } else if (random <= 80) {
-      return items.indexOf("Get 10%");
+      return 2; // 🎊 10%
     } else if (random <= 90) {
-      return items.indexOf("Flat ₹100");
+      return 1; // 💵 ₹100
     } else if (random <= 95) {
-      return items.indexOf("Try Again");
+      return 9; // 🔄 Retry
     } else {
-      return items.indexOf("Get 5%");
+      return 1; // 💵 ₹100 (or another reward)
     }
   }
+  // int getRewardIndex() {
+  //   int random = Fortune.randomInt(1, 101);
+  //
+  //   if (random <= 3) {
+  //     return items.indexOf("Get 50%");
+  //   } else if (random <= 8) {
+  //     return items.indexOf("Gift Card");
+  //   } else if (random <= 18) {
+  //     return items.indexOf("Get 30%");
+  //   } else if (random <= 30) {
+  //     return items.indexOf("Get 20%");
+  //   } else if (random <= 42) {
+  //     return items.indexOf("Flat ₹300");
+  //   } else if (random <= 55) {
+  //     return items.indexOf("Get 15%");
+  //   } else if (random <= 68) {
+  //     return items.indexOf("Flat ₹200");
+  //   } else if (random <= 80) {
+  //     return items.indexOf("Get 10%");
+  //   } else if (random <= 90) {
+  //     return items.indexOf("Flat ₹100");
+  //   } else if (random <= 95) {
+  //     return items.indexOf("Try Again");
+  //   } else {
+  //     return items.indexOf("Get 5%");
+  //   }
+  // }
 
-  void spinWheel() {
+  void spinWheel() { /// Called when user clicks: SPIN NOW
 
     spinCount++;
-    final selected = getRewardIndex();
+    final selected = getRewardIndex(); ///Controls the wheel spinning,wheel rotates to that index.
     controller.add(selected);
 
-    // debugPrint("Spin #$spinCount");
-    // debugPrint("Selected Index: $selected");
-    // debugPrint("Reward: ${items[selected]}");
+    debugPrint("Spin #$spinCount");
+    debugPrint("Selected Index: $selected");
+    debugPrint("Reward: ${items[selected]}");
     debugPrint("Spin #$spinCount - Reward: ${items[selected]}");
 
     print("+++++++++++++++++++++++++");
+    print("+++++++++++++++++++++++++ ");
+    print("+++++++++++++++++++++++++ ");
+    print("+++++++++++++++++++++++++ ");
+    print("+++++++++++++++++++++++++ ");
+    print("+++++++++++++++++++++++++ ");
+    print("+++++++++++++++++++++++++ ");
     print("SPIN STARTED");
     log(
       "Reward: ${items[selected]}",
       name: "KMR_SPIN",
     );
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 4), () { ///Waits for wheel animation.
 
       final prize = items[selected];
 
-      setState(() {
+      setState(() { ///Refreshes UI.Without this: UI won't update.
         result = prize;
       });
 
@@ -146,7 +178,7 @@ class _SpinWheelPageState extends State<SpinWheelPage>
   }
 
   @override
-  void dispose() {
+  void dispose() { ///Cleanup. to prevent memory leaks.
     _controller.dispose();
     super.dispose();
 
@@ -154,20 +186,21 @@ class _SpinWheelPageState extends State<SpinWheelPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold( ///Main page structure. Screen Layout Material design behavior
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xff1E3A8A),
-              Color(0xff111827),
+              Color(0xFF14003D),
+              Color(0xFF22005B),
+              Color(0xFF070021),
             ],
           ),
         ),
         child: SafeArea(
-          child: Column(
+          child: Column( ///Places widgets vertically. Logo , Wheel, Result, Button
             children: [
 
               const SizedBox(height: 20),
@@ -178,50 +211,17 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                   AnimatedBuilder(
                     animation: _swingAnimation,
                     builder: (context, child) {
-                      return Transform.rotate(
+                      return Transform.rotate( ///Rotates logo. Creates swinging effect.
                         angle: _swingAnimation.value,
                         alignment: Alignment.topCenter,
                         child: child,
                       );
                     },
-                    // child: Column(
-                    //   children: [
-                    //     Container(
-                    //       width: 2,
-                    //       height: 20,
-                    //       color: Colors.white70,
-                    //     ),
-                    //     Container(
-                    //       padding: const EdgeInsets.symmetric(
-                    //         horizontal: 12,
-                    //         vertical: 6,
-                    //       ),
-                    //       decoration: BoxDecoration(
-                    //         gradient: const LinearGradient(
-                    //           colors: [
-                    //             Color(0xFFFFF176),
-                    //             Color(0xFFFFD700),
-                    //             Color(0xFFFFA000),
-                    //           ],
-                    //         ),
-                    //         borderRadius: BorderRadius.circular(12),
-                    //       ),
-                    //       child: Text(
-                    //         "KMR's",
-                    //         style: GoogleFonts.poppins(
-                    //           color: Colors.black,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                   ),
 
                   const SizedBox(width: 12),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Column(
                     children: [
                       AnimatedBuilder(
                         animation: _swingAnimation,
@@ -234,38 +234,18 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                         },
                         child: Image.asset(
                           'assets/images/kmr_logo.png',
-                          height: 70,
+                          height: 80,
                         ),
                       ),
 
-                      const SizedBox(width: 8),
-
-                      Text(
-                        "Lucky Spin",
-                        style: GoogleFonts.poppins(
-                          fontSize: 32,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ],
               ),
 
-              // Container(
-              //   margin: const EdgeInsets.symmetric(horizontal: 20),
-              //   padding: const EdgeInsets.all(16),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white.withOpacity(.15),
-              //     borderRadius: BorderRadius.circular(20),
-              //   ),
-              // ),
-
-              // const SizedBox(height: 30),
-
               Expanded(
-                child: Stack(
+                child: Stack( ///Places widgets on top of each other.,  Glow, Border, Wheel, Center, Button
                   alignment: Alignment.center,
                   children: [
 
@@ -291,24 +271,45 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                       height: 330,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
+                        border: Border.all( /// Border Ring [Golden outer ring.]
                           color: Colors.amber,
                           width: 12,
                         ),
                       ),
                     ),
 
-                    FortuneWheel(
+                    FortuneWheel( ///Main spinning wheel. Listens to: controller.add(index)
                       selected: controller.stream,
                       animateFirst: false,
-
-                      indicators: const [
+                      /// Arrow pointer. Shows winning position.
+                      indicators: [
                         FortuneIndicator(
                           alignment: Alignment.topCenter,
-                          child: Icon(
-                            Icons.arrow_drop_down,
-                            size: 70,
-                            color: Color(0xFFFFD700),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFFFFF176),
+                                  Color(0xFFFFD700),
+                                  Color(0xFFFFA000),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.amber,
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Color(0xFF7B1FA2),
+                              size: 40,
+                            ),
                           ),
                         ),
                       ],
@@ -318,24 +319,32 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                           FortuneItem(
                             style: FortuneItemStyle(
                               color: index.isEven
-                                  ? Color(0xFFFFEB3B)
-                                  : Color(0xFF1565C0),
+                                  ? const Color(0xFFFFD700)
+                                  : const Color(0xFF5B0FB8),
                               borderColor: Colors.black,
                               borderWidth: 1,
                             ),
-                            child: Text(
-                              items[index],
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            child: Transform.translate(
+                              offset: const Offset(60, 0),///This is to use for change the emoji and font movement
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  items[index],
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    height: 1.1,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                       ],
                     ),
 
-                    // Center SPIN button
+                    /// Center SPIN button Placed in center of wheel. Acts as decorative center cap.
                     Container(
                       width: 110,
                       height: 110,
@@ -380,6 +389,7 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
+                  ///Press Spin To Win -OR- Congratulations! You Won Flat ₹300
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -424,3 +434,27 @@ class _SpinWheelPageState extends State<SpinWheelPage>
     );
   }
 }
+
+/*
+App Opens
+     ↓
+Logo Swinging
+     ↓
+User clicks SPIN NOW
+     ↓
+Random reward selected
+     ↓
+controller.add(index)
+     ↓
+Wheel rotates
+     ↓
+4 sec wait
+     ↓
+Result stored
+     ↓
+Dialog shown
+     ↓
+User clicks OK
+     ↓
+Ready for next spin
+ */
