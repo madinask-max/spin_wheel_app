@@ -4,6 +4,7 @@ import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer';
 import 'dart:math' as math;
+import 'package:confetti/confetti.dart';
 
 ///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
@@ -44,31 +45,42 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
     "15%",
     "₹300",
     "20%",
-    "Card",
+    "COUPON",
     "30%",
-    "RETRY",
+    "25%",
   ];
 
   final List<String> segmentEmojis = [
     "🎉",
-    "💵",
+    "💰",
     "🎊",
     "💰",
-    "😍",
-    "💸",
+    "🤩",
+    "💰",
     "🎁",
-    "🎫",
+    "💰",
     "🔥",
-    "🔄",
+    "🥳",
   ];
   int spinCount = 0;
   String result = "";
   int? winningIndex;
+  bool isSpinning = false;
+  bool showHighlight = false;
+  late ConfettiController _confettiController;
+
+  Color _dimColor(Color color) {
+    // blends the segment color 55% toward black to visually "dim" it
+    return Color.alphaBlend(Colors.black.withOpacity(0.55), color);
+  }
 
   @override
   void initState() { ///Runs once when screen loads.
     super.initState();
 
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 5), // how long particles keep emitting
+    );
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -139,10 +151,16 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   //   }
   // }
 
-  void spinWheel() { /// Called when user clicks: SPIN NOW
+  void spinWheel() {
+    if (isSpinning) return;
+
+    setState(() {
+      isSpinning = true;
+      showHighlight = false; // make sure previous highlight is cleared
+    });
 
     spinCount++;
-    final selected = getRewardIndex(); ///Controls the wheel spinning,wheel rotates to that index.
+    final selected = getRewardIndex();
     setState(() {
       winningIndex = selected;
     });
@@ -150,50 +168,54 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
     debugPrint("Spin #$spinCount");
     debugPrint("Selected Index: $selected");
-    // debugPrint("Reward: ${items[selected]}");
     debugPrint("Reward: ${segmentTexts[selected]}");
-    // debugPrint("Spin #$spinCount - Reward: ${items[selected]}");
 
-    print("+++++++++++++++++++++++++");
-    print("+++++++++++++++++++++++++ ");
-    print("+++++++++++++++++++++++++ ");
-    print("+++++++++++++++++++++++++ ");
-    print("+++++++++++++++++++++++++ ");
-    print("+++++++++++++++++++++++++ ");
-    print("+++++++++++++++++++++++++ ");
-    print("SPIN STARTED");
-    log(
-      "Reward: ${segmentTexts[selected]}",
-      name: "KMR_SPIN",
-    );
-    Future.delayed(const Duration(seconds: 4), () { ///Waits for wheel animation.
+    log("Reward: ${segmentTexts[selected]}", name: "KMR_SPIN");
 
-      // final prize = items[selected];
+    Future.delayed(const Duration(seconds: 4), () {
       final prize = segmentTexts[selected];
-    setState(() { ///Refreshes UI.Without this: UI won't update.
-    winningIndex = selected;
+      setState(() {
+        winningIndex = selected;
         result = prize;
+        showHighlight = true;
       });
 
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Congratulations 🎉"),
-          content: Text("You won $prize"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
+      _confettiController.play(); // NEW — start crackers animation
 
-                setState(() {
-                  result = "";
-                });
-              },
-              child: const Text("OK"),
-            )
-          ],
-        ),
-      );
+      Future.delayed(const Duration(seconds: 2), () {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              backgroundColor: Colors.lightGreen,
+              title: const Text(
+                "Congratulations 🎉",
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              content: Text(
+                "You won $prize",
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _confettiController.stop(); // NEW — stop crackers when OK tapped
+                    setState(() {
+                      result = "";
+                      isSpinning = false;
+                      showHighlight = false;
+                    });
+                  },
+                  child: const Text("OK"),
+                )
+              ],
+            ),
+          ),
+        );
+      });
     });
   }
 
@@ -336,35 +358,47 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
                       items: [
                         for (int index = 0; index < segmentTexts.length; index++)
-                          FortuneItem(
-                            style: FortuneItemStyle(
-                              color: index.isEven
-                                  ? const Color(0xFFFFD700)
-                                  : const Color(0xFF5B0FB8),
-                              borderColor: Colors.black,
-                              borderWidth: 1,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  segmentEmojis[index],
-                                  style: const TextStyle(fontSize: 30),
+                              () {
+                            final bool isWinner = showHighlight && index == winningIndex;
+                            final bool shouldDim = showHighlight && !isWinner;
+
+                            final Color baseColor = index.isEven
+                                ? const Color(0xFFFF8C00) // Dark Orange
+                                : const Color(0xFF5B0FB8); // Purple
+
+                            final Color segmentColor = shouldDim ? _dimColor(baseColor) : baseColor;
+
+                            return FortuneItem(
+                              style: FortuneItemStyle(
+                                color: segmentColor,
+                                borderColor: isWinner ? Colors.white : Colors.black,
+                                borderWidth: isWinner ? 5 : 1,
+                              ),
+                              child: Opacity(
+                                opacity: shouldDim ? 0.45 : 1.0, // dim text+emoji too
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(width: 50),
+                                    Text(
+                                      segmentTexts[index],
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: isWinner ? Colors.yellowAccent : Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      segmentEmojis[index],
+                                      style: TextStyle(fontSize: isWinner ? 36 : 30),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  segmentTexts[index],
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          }(),
                       ],
                     ),
 
@@ -403,36 +437,22 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),
 
               const SizedBox(height: 20),
 
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  ///Press Spin To Win -OR- Congratulations! You Won Flat ₹300
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Text(
-                  result.isEmpty
-                      ? "Press Spin To Win"
-                      : "Congratulations! You Won $result",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
+
 
               const SizedBox(height: 20),
 
               ElevatedButton(
-                onPressed: spinWheel,
+                onPressed: isSpinning ? null : spinWheel,
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: isSpinning ? Colors.grey : Colors.orange, // button background
+                  foregroundColor: Colors.purple, // text color
                   padding: const EdgeInsets.symmetric(
                     horizontal: 60,
                     vertical: 18,
@@ -441,11 +461,12 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text(
-                  "SPIN NOW",
-                  style: TextStyle(
+                child: Text(
+                  isSpinning ? "SPINNING..." : "SPIN NOW",
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: Colors.purple, // explicit, in case foregroundColor gets overridden by theme
                   ),
                 ),
               ),
