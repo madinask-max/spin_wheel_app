@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   confetti: ^0.7.0
+  audioplayers: ^6.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,6 +67,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/audio/western_spin.mp3
 
   # To add assets to your application, add an assets section, like this:
   # assets:

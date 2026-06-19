@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer';
 import 'dart:math' as math;
 import 'package:confetti/confetti.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 ///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
@@ -68,6 +69,7 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   bool isSpinning = false;
   bool showHighlight = false;
   late ConfettiController _confettiController;
+  final AudioPlayer _spinSoundPlayer = AudioPlayer();
 
 
   Color _dimColor(Color color) {
@@ -172,9 +174,11 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
     debugPrint("Reward: ${segmentTexts[selected]}");
 
     log("Reward: ${segmentTexts[selected]}", name: "KMR_SPIN");
+    _spinSoundPlayer.play(AssetSource('audio/western_spin.mp3'));
 
     Future.delayed(const Duration(seconds: 4), () {
       final prize = segmentTexts[selected];
+      _spinSoundPlayer.stop();
       setState(() {
         winningIndex = selected;
         result = prize;
@@ -223,6 +227,8 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   @override
   void dispose() { ///Cleanup. to prevent memory leaks.
     _controller.dispose();
+    _confettiController.dispose();
+    _spinSoundPlayer.dispose(); // NEW
     super.dispose();
 
   }
