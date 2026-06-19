@@ -69,6 +69,7 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   bool showHighlight = false;
   late ConfettiController _confettiController;
 
+
   Color _dimColor(Color color) {
     // blends the segment color 55% toward black to visually "dim" it
     return Color.alphaBlend(Colors.black.withOpacity(0.55), color);
@@ -437,7 +438,27 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                         ),
                       ),
                     ),
-
+                    // Confetti overlay — rendered last so it's on top
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConfettiWidget(
+                        confettiController: _confettiController,
+                        blastDirection: math.pi / 2,
+                        maxBlastForce: 20,
+                        minBlastForce: 8,
+                        emissionFrequency: 0.05,
+                        numberOfParticles: 30,
+                        gravity: 0.3,
+                        shouldLoop: false,
+                        colors: const [
+                          Colors.orange,
+                          Colors.purple,
+                          Colors.amber,
+                          Colors.green,
+                          Colors.pink,
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
