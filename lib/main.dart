@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer';
+import 'dart:math' as math;
 
 ///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
@@ -35,20 +36,34 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   late AnimationController _controller; ///Controls logo swinging.
   late Animation<double> _swingAnimation; ///Creates motion: Left → Right → Left
 
-  final List<String> items = [
-    "🎉🎉🎉\n50%",
-    "💰\n₹100",
-    "🎊\n10%",
-    "💰💰\n₹200",
-    "😍\n15%",
-    "💰💰💰\n₹300",
-    "🎁\n20%",
-    "🎫\nCard",
-    "🔥\n30%",
-    "🔄\nRetry",
+  final List<String> segmentTexts = [
+    "50%",
+    "₹100",
+    "10%",
+    "₹200",
+    "15%",
+    "₹300",
+    "20%",
+    "Card",
+    "30%",
+    "RETRY",
+  ];
+
+  final List<String> segmentEmojis = [
+    "🎉",
+    "💵",
+    "🎊",
+    "💰",
+    "😍",
+    "💸",
+    "🎁",
+    "🎫",
+    "🔥",
+    "🔄",
   ];
   int spinCount = 0;
   String result = "";
+  int? winningIndex;
 
   @override
   void initState() { ///Runs once when screen loads.
@@ -128,12 +143,16 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
     spinCount++;
     final selected = getRewardIndex(); ///Controls the wheel spinning,wheel rotates to that index.
+    setState(() {
+      winningIndex = selected;
+    });
     controller.add(selected);
 
     debugPrint("Spin #$spinCount");
     debugPrint("Selected Index: $selected");
-    debugPrint("Reward: ${items[selected]}");
-    debugPrint("Spin #$spinCount - Reward: ${items[selected]}");
+    // debugPrint("Reward: ${items[selected]}");
+    debugPrint("Reward: ${segmentTexts[selected]}");
+    // debugPrint("Spin #$spinCount - Reward: ${items[selected]}");
 
     print("+++++++++++++++++++++++++");
     print("+++++++++++++++++++++++++ ");
@@ -144,14 +163,15 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
     print("+++++++++++++++++++++++++ ");
     print("SPIN STARTED");
     log(
-      "Reward: ${items[selected]}",
+      "Reward: ${segmentTexts[selected]}",
       name: "KMR_SPIN",
     );
     Future.delayed(const Duration(seconds: 4), () { ///Waits for wheel animation.
 
-      final prize = items[selected];
-
-      setState(() { ///Refreshes UI.Without this: UI won't update.
+      // final prize = items[selected];
+      final prize = segmentTexts[selected];
+    setState(() { ///Refreshes UI.Without this: UI won't update.
+    winningIndex = selected;
         result = prize;
       });
 
@@ -251,8 +271,8 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
                     // Gold outer glow
                     Container(
-                      width: 340,
-                      height: 340,
+                      width: 360,
+                      height: 360,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -315,7 +335,7 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                       ],
 
                       items: [
-                        for (int index = 0; index < items.length; index++)
+                        for (int index = 0; index < segmentTexts.length; index++)
                           FortuneItem(
                             style: FortuneItemStyle(
                               color: index.isEven
@@ -324,21 +344,25 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                               borderColor: Colors.black,
                               borderWidth: 1,
                             ),
-                            child: Transform.translate(
-                              offset: const Offset(60, 0),///This is to use for change the emoji and font movement
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: Text(
-                                  items[index],
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  segmentEmojis[index],
+                                  style: const TextStyle(fontSize: 30),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  segmentTexts[index],
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    height: 1.1,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                       ],

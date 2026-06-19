@@ -15,3 +15,10 @@ shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb devices
 List of devices attached
 192.168.1.8:5555        device
 shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % flutter logs
+
+
+
+shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb connect 192.168.1.7:5555
+failed to authenticate to 192.168.1.7:5555
+shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb connect 192.168.1.7:5555
+already connected to 192.168.1.7:5555
