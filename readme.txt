@@ -5,7 +5,7 @@ To run the APP : flutter run -d 10BF672C2P0098X
 WITH WIRELESS: flutter run -d 192.168.1.8:5555
 shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % flutter run -d 192.168.1.8:5555
 shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % flutter logs
-To make realse app : flutter build apk --release
+To make realse app : flutter build apk --releas
 WIRELESS CONNECTION
 
 shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb connect 192.168.1.8:5555
