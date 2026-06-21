@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'dart:math' as math;
 import 'package:confetti/confetti.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:marquee/marquee.dart';
 
 ///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
@@ -253,23 +254,9 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
             children: [
 
               const SizedBox(height: 20),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AnimatedBuilder(
-                    animation: _swingAnimation,
-                    builder: (context, child) {
-                      return Transform.rotate( ///Rotates logo. Creates swinging effect.
-                        angle: _swingAnimation.value,
-                        alignment: Alignment.topCenter,
-                        child: child,
-                      );
-                    },
-                  ),
-
-                  const SizedBox(width: 12),
-
                   Column(
                     children: [
                       AnimatedBuilder(
@@ -286,12 +273,32 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                           height: 80,
                         ),
                       ),
-
-                      const SizedBox(height: 10),
                     ],
                   ),
                 ],
               ),
+
+                const SizedBox(height: 10),
+
+// ===========================
+// ANNIVERSARY CRAWLER HERE
+// ===========================
+                Container(
+                  height: 60,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/images/anniversary_banner.png',
+                      height: 60,
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
 
               Expanded(
                 child: Stack( ///Places widgets on top of each other.,  Glow, Border, Wheel, Center, Button
@@ -471,10 +478,6 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
               const SizedBox(height: 20),
 
-
-
-              const SizedBox(height: 20),
-
               ElevatedButton(
                 onPressed: isSpinning ? null : spinWheel,
                 style: ElevatedButton.styleFrom(
@@ -506,6 +509,67 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
     );
   }
 }
+
+// class AnniversaryBanner extends StatefulWidget {
+//   const AnniversaryBanner({super.key});
+//
+//   @override
+//   State<AnniversaryBanner> createState() =>
+//       _AnniversaryBannerState();
+
+
+// class _AnniversaryBannerState
+//     extends State<AnniversaryBanner>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController controller;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     controller = AnimationController(
+//       vsync: this,
+//       duration: const Duration(seconds: 12),
+//     )..repeat();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height: 60,
+//       child: AnimatedBuilder(
+//         animation: controller,
+//         builder: (context, child) {
+//           return Transform.translate(
+//             offset: Offset(
+//               -1200 * controller.value,
+//               0,
+//             ),
+//             child: Row(
+//               children: [
+//                 Image.asset(
+//                   'assets/images/anniversary_banner.png',
+//                   height: 60,
+//                 ),
+//                 const SizedBox(width: 30),
+//                 Image.asset(
+//                   'assets/images/anniversary_banner.png',
+//                   height: 60,
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+//
+//   @override
+//   void dispose() {
+//     controller.dispose();
+//     super.dispose();
+//   }
+// }
 
 /*
 App Opens
