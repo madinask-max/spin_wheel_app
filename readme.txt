@@ -22,3 +22,9 @@ shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb connect 192.168.1.7:555
 failed to authenticate to 192.168.1.7:5555
 shaikmadinabasha@shaiks-MacBook-Pro spin_wheel_app % adb connect 192.168.1.7:5555
 already connected to 192.168.1.7:5555
+
+Added logic in App script file
+https://script.google.com/home/projects/1n3v8OJqCjg7TXvklorSuB7aEzMf5iOMREQgBcAw_bjroMhyS8SWsiMrO/edit
+
+Below is the google sheet writing response
+https://docs.google.com/spreadsheets/d/1JRIUpPszynFAUf0LiSmpjH4YO6fEewh6O6Jd9M2Ev-s/edit?gid=0#gid=0

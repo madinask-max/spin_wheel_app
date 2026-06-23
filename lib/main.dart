@@ -7,6 +7,9 @@ import 'dart:math' as math;
 import 'package:confetti/confetti.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:marquee/marquee.dart';
+import 'dart:math';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 ///Entry point of the Flutter application and Flutter starts execution from main(). runApp() loads the root widget. [MyApp]
 void main() {
@@ -38,7 +41,96 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
 
   late AnimationController _controller; ///Controls logo swinging.
   late Animation<double> _swingAnimation; ///Creates motion: Left → Right → Left
+  Future<int> getRewardIndexFromSheet() async {
+    try {
+      const apiUrl ='https://script.google.com/macros/s/AKfycbxK2bAGDPwGLFU4JJ2QApLdxp042Sqbq6yM1GI65B_5hgN-ZH-MWA6dmoyuF8P7uvtFrg/exec';
+      print("Request URL: $apiUrl");
+      final response = await http.get(Uri.parse(apiUrl));
 
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Final URL: ${response.request?.url}");
+      debugPrint("Response Body: ${response.body}");
+
+
+      final data = jsonDecode(response.body);
+
+
+      debugPrint("================================");
+      debugPrint("API RESPONSE = ${response.body}");
+      debugPrint("API REWARD = ${data['reward']}");
+      print("RAW TYPE = ${data['reward'].runtimeType}");
+      debugPrint("================================");
+
+      final reward = data['reward'];
+      debugPrint("================================");
+      debugPrint("RAW REWARD = $reward");
+      debugPrint("RAW TYPE = ${reward.runtimeType}");
+      debugPrint("================================");
+      String rewardText;
+
+      switch (reward.toString().trim()) {
+        case "0.1":
+        case "10":
+        case "10%":
+          rewardText = "10%";
+          break;
+
+        case "0.15":
+        case "15":
+        case "15%":
+          rewardText = "15%";
+          break;
+
+        case "0.2":
+        case "20":
+        case "20%":
+          rewardText = "20%";
+          break;
+
+        case "0.25":
+        case "25":
+        case "25%":
+          rewardText = "25%";
+          break;
+
+        case "0.3":
+        case "30":
+        case "30%":
+          rewardText = "30%";
+          break;
+
+        case "0.5":
+        case "50":
+        case "50%":
+          rewardText = "50%";
+          break;
+
+        default:
+          rewardText = reward.toString();
+      }
+
+      final index = segmentTexts.indexOf(rewardText);
+
+      debugPrint("API Reward = $reward");
+      debugPrint("Mapped Reward = $rewardText");
+      debugPrint("Index = $index");
+
+      debugPrint("Mapped Reward = $rewardText");
+      debugPrint("Wheel Index = $index");
+
+      if (index == -1) {
+        debugPrint(
+            "Reward not found on wheel. Falling back.");
+        return getRewardIndex();
+      }
+
+      return index;
+    } catch (e) {
+      debugPrint("API ERROR: $e");
+
+      return getRewardIndex(); // fallback to old logic
+    }
+  }
   final List<String> segmentTexts = [
     "50%",
     "₹100",
@@ -155,74 +247,95 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
   //   }
   // }
 
-  void spinWheel() {
+  Future<void> spinWheel() async {
     if (isSpinning) return;
 
     setState(() {
       isSpinning = true;
-      showHighlight = false; // make sure previous highlight is cleared
+      showHighlight = false;
+      result = "";
     });
 
     spinCount++;
-    final selected = getRewardIndex();
+
+    int selected;
+
+    try {
+      selected = await getRewardIndexFromSheet();
+    } catch (e) {
+      debugPrint("API FAILED: $e");
+      selected = getRewardIndex();
+    }
+
+    // Safety check
+    if (selected < 0 || selected >= segmentTexts.length) {
+      debugPrint("Invalid index received: $selected");
+      selected = getRewardIndex();
+    }
+
+    debugPrint(
+        "FINAL REWARD = ${segmentTexts[selected]}");
+    debugPrint(
+        "FINAL INDEX = $selected");
+
     setState(() {
       winningIndex = selected;
     });
+
+    debugPrint(
+        "Wheel Will Stop At = ${segmentTexts[selected]}");
+
+    // Start wheel FIRST
     controller.add(selected);
 
-    debugPrint("Spin #$spinCount");
-    debugPrint("Selected Index: $selected");
-    debugPrint("Reward: ${segmentTexts[selected]}");
+    // Start sound together with wheel
+    _spinSoundPlayer.stop();
+    _spinSoundPlayer.play(
+      AssetSource('audio/western_spin.mp3'),
+    );
 
-    log("Reward: ${segmentTexts[selected]}", name: "KMR_SPIN");
-    _spinSoundPlayer.play(AssetSource('audio/western_spin.mp3'));
+    await Future.delayed(
+      const Duration(seconds: 5),
+    );
 
-    Future.delayed(const Duration(seconds: 4), () {
-      final prize = segmentTexts[selected];
-      _spinSoundPlayer.stop();
-      setState(() {
-        winningIndex = selected;
-        result = prize;
-        showHighlight = true;
-      });
+    await _spinSoundPlayer.stop();
 
-      _confettiController.play(); // NEW — start crackers animation
+    final prize = segmentTexts[selected];
 
-      Future.delayed(const Duration(seconds: 2), () {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => PopScope(
-            canPop: false,
-            child: AlertDialog(
-              backgroundColor: Colors.lightGreen,
-              title: const Text(
-                "Congratulations 🎉",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              content: Text(
-                "You won $prize",
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _confettiController.stop(); // NEW — stop crackers when OK tapped
-                    setState(() {
-                      result = "";
-                      isSpinning = false;
-                      showHighlight = false;
-                    });
-                  },
-                  child: const Text("OK"),
-                )
-              ],
-            ),
-          ),
-        );
-      });
+    setState(() {
+      result = prize;
+      showHighlight = true;
     });
+
+    _confettiController.play();
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.lightGreen,
+        title: const Text("Congratulations 🎉"),
+        content: Text("You won $prize"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+
+              _confettiController.stop();
+
+              setState(() {
+                result = "";
+                isSpinning = false;
+                showHighlight = false;
+              });
+            },
+            child: const Text("OK"),
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -417,36 +530,27 @@ class _SpinWheelPageState extends State<SpinWheelPage> ///Wheel logic, Animation
                     ),
 
                     /// Center SPIN button Placed in center of wheel. Acts as decorative center cap.
-                    Container(
-                      width: 110,
-                      height: 110,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFFF176),
-                            Color(0xFFFFD700),
-                            Color(0xFFFFA000),
+                    Center(
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.amber,
+                            width: 4,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.amber,
+                              blurRadius: 20,
+                            ),
                           ],
                         ),
-                        border: Border.all(
-                          color: Colors.brown,
-                          width: 4,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.amber.withOpacity(.6),
-                            blurRadius: 15,
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "SPIN",
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/kmr_logo.png',
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
