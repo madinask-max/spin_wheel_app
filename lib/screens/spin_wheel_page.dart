@@ -8,13 +8,20 @@ import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import '../data/wheel_data.dart';
 import '../services/reward_service.dart';
 import '../widgets/result_dialog.dart';
+import 'mobile_number_page.dart';
 
 // ===========================
 // SPIN WHEEL PAGE WIDGET
 // ===========================
 
 class SpinWheelPage extends StatefulWidget {
-  const SpinWheelPage({super.key});
+
+  final String mobileNumber;
+
+  const SpinWheelPage({
+    super.key,
+    required this.mobileNumber,
+  });
 
   @override
   State<SpinWheelPage> createState() => _SpinWheelPageState();
@@ -124,6 +131,7 @@ class _SpinWheelPageState extends State<SpinWheelPage>
         "FINAL REWARD = ${segmentTexts[selected]}");
     debugPrint(
         "FINAL INDEX = $selected");
+    debugPrint("MOBILE NUMBER IS: ${widget.mobileNumber}");
 
     setState(() {
       winningIndex = selected;
@@ -167,6 +175,14 @@ class _SpinWheelPageState extends State<SpinWheelPage>
         Navigator.pop(context);
 
         _confettiController.stop();
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MobileNumberPage(),
+          ),
+              (route) => false,
+        ); ///Show mobile screen Again for every Spin
 
         setState(() {
           result = "";
