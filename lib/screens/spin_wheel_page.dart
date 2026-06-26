@@ -30,7 +30,7 @@ class _SpinWheelPageState extends State<SpinWheelPage>
   // ===========================
   // VARIABLES
   // ===========================
-
+  int countdown = 0;
   int spinCount = 0;
   String result = "";
 
@@ -97,11 +97,18 @@ class _SpinWheelPageState extends State<SpinWheelPage>
 
 
     try {
-      selected = await RewardService.getRewardIndexFromSheet(
+      final rewardFuture = RewardService.getRewardIndexFromSheet(
         segmentTexts,
         getRewardIndex,
       );
 
+      final countdownFuture = startCountdown();
+
+      await Future.wait([
+        rewardFuture,
+        countdownFuture,
+      ]);
+      selected = await rewardFuture;
     } catch (e) {
       debugPrint("API FAILED: $e");
       selected = getRewardIndex();
@@ -198,6 +205,25 @@ class _SpinWheelPageState extends State<SpinWheelPage>
     }
 
   }
+
+  Future<void> startCountdown() async {
+    for (int i = 4; i >= 1; i--) {
+      if (!mounted) return;
+
+      setState(() {
+        countdown = i;
+      });
+
+      await Future.delayed(const Duration(seconds: 1));
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      countdown = 0;
+    });
+  }
+
 
 
   // ===========================
@@ -419,7 +445,18 @@ class _SpinWheelPageState extends State<SpinWheelPage>
                             ),
                           ],
                         ),
-                        child: ClipOval(
+                        child: countdown > 0
+                            ? Center(
+                          child: Text(
+                            "$countdown",
+                            style: const TextStyle(
+                              fontSize: 56,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                            : ClipOval(
                           child: Image.asset(
                             'assets/images/kmr_logo.png',
                             fit: BoxFit.cover,
