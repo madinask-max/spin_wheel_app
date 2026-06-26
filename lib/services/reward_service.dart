@@ -23,8 +23,13 @@ class RewardService {
       final data =
       jsonDecode(response.body);
 
+      debugPrint("API Response: $data");
+
+
       final reward =
       data['reward'];
+
+      debugPrint("Reward from API: $reward");
 
       String rewardText;
 
@@ -69,6 +74,8 @@ class RewardService {
         default:
           rewardText = reward.toString();
       }
+
+      debugPrint("Mapped Reward Text: $rewardText");
 
       final index =
       segmentTexts.indexOf(

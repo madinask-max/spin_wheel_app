@@ -110,6 +110,8 @@ class _SpinWheelPageState extends State<SpinWheelPage>
         widget.mobileNumber,
       );
 
+
+
       final countdownFuture = startCountdown();
 
       await Future.wait([
@@ -121,6 +123,9 @@ class _SpinWheelPageState extends State<SpinWheelPage>
       debugPrint("API FAILED: $e");
       selected = getRewardIndex();
     }
+
+    debugPrint("Selected Index: $selected");
+    debugPrint("Selected Reward: ${segmentTexts[selected]}");
 
     // Safety check
     if (selected < 0 || selected >= segmentTexts.length) {

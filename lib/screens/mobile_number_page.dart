@@ -8,15 +8,40 @@ class MobileNumberPage extends StatefulWidget {
   State<MobileNumberPage> createState() => _MobileNumberPageState();
 }
 
-class _MobileNumberPageState extends State<MobileNumberPage> {
+class _MobileNumberPageState extends State<MobileNumberPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _mobileController = TextEditingController();
+
+  late AnimationController _controller;
+  late Animation<double> _swingAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _swingAnimation = Tween<double>(
+      begin: -0.1,
+      end: 0.1,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
 
   @override
   void dispose() {
     _mobileController.dispose();
     _mobileController.clear();
     _mobileController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -45,9 +70,19 @@ class _MobileNumberPageState extends State<MobileNumberPage> {
                 child: Column(
                   children: [
 
-                    Image.asset(
-                      "assets/images/kmr_logo.png",
-                      height: 100,
+                    AnimatedBuilder(
+                      animation: _swingAnimation,
+                      builder: (context, child) {
+                        return Transform.rotate(
+                          angle: _swingAnimation.value,
+                          alignment: Alignment.topCenter,
+                          child: child,
+                        );
+                      },
+                      child: Image.asset(
+                        "assets/images/kmr_logo.png",
+                        height: 120,
+                      ),
                     ),
 
                     const SizedBox(height: 20),
