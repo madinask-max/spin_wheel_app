@@ -1,19 +1,24 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 class RewardService {
 
   static Future<int> getRewardIndexFromSheet(
       List<String> segmentTexts,
       int Function() fallback,
+      String mobile,
       ) async {
 
     try {
 
       const apiUrl =
-          'https://script.google.com/macros/s/AKfycbxK2bAGDPwGLFU4JJ2QApLdxp042Sqbq6yM1GI65B_5hgN-ZH-MWA6dmoyuF8P7uvtFrg/exec';
+          'https://script.google.com/macros/s/AKfycbz-evYzqkf2FGHp-0orT5O4s3wO6XcrsZpUXHJ_RXXipvMWlJZeTbPJxn7ae_bZAq0WPA/exec';
+
+      debugPrint("Sending Mobile: $mobile");
+      debugPrint("URL: $apiUrl?mobile=$mobile");
 
       final response =
-      await http.get(Uri.parse(apiUrl));
+      await http.get(Uri.parse('$apiUrl?mobile=$mobile'));
 
       final data =
       jsonDecode(response.body);

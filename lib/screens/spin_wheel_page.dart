@@ -107,6 +107,7 @@ class _SpinWheelPageState extends State<SpinWheelPage>
       final rewardFuture = RewardService.getRewardIndexFromSheet(
         segmentTexts,
         getRewardIndex,
+        widget.mobileNumber,
       );
 
       final countdownFuture = startCountdown();
