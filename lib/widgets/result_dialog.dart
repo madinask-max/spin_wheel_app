@@ -1,31 +1,45 @@
 import 'package:flutter/material.dart';
+import '../widgets/congratulation_overlay.dart';
 
 class ResultDialog {
-
   static Future<void> show(
       BuildContext context,
       String prize,
       VoidCallback onOk,
       ) {
-
-    return showDialog(
+    return showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) {
-        return AlertDialog(
-          backgroundColor:
-          Colors.lightGreen,
-          title: const Text(
-            "Congratulations 🎉",
-          ),
-          content:
-          Text("You won $prize"),
-          actions: [
-            ElevatedButton(
-              onPressed: onOk,
-              child: const Text("OK"),
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 400),
+
+      pageBuilder: (_, __, ___) {
+        return CongratulationsOverlay(
+          prize: prize,
+          onContinue: onOk,
+        );
+      },
+
+      transitionBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+          ) {
+        return SlideTransition(
+          position: Tween(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
             ),
-          ],
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
         );
       },
     );
