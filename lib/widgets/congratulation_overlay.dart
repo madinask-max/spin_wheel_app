@@ -20,26 +20,21 @@ class CongratulationsOverlay extends StatelessWidget {
 
           /// Slight blur
           Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 2,
-                sigmaY: 2,
-              ),
+            child: IgnorePointer(
               child: Container(
-                color: Colors.black.withValues(alpha: .20),
+                color: Colors.black.withValues(alpha: 0.15),
               ),
             ),
           ),
-
           /// Bottom Card
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
               child: Container(
                 margin: const EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                  bottom: 20,
+                  left: 40,
+                  right: 40,
+                  bottom: 80,
                 ),
 
                 padding: const EdgeInsets.all(20),
@@ -78,7 +73,8 @@ class CongratulationsOverlay extends StatelessWidget {
                     const Text(
                       "You Won",
                       style: TextStyle(
-                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                         fontSize: 18,
                       ),
                     ),
